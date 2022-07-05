@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:magdsoft_flutter_structure/business_logic/global_cubit/global_cubit.dart';
 import 'package:magdsoft_flutter_structure/layout/LoginScreen.dart';
 
@@ -26,16 +27,38 @@ class RegisterScreen extends StatelessWidget {
     return BlocProvider(
       create: (BuildContext context) => GlobalCubit(),
       child: BlocConsumer<GlobalCubit, GlobalState>(
-        listener: (context, state) {},
+        listener: (context, state) {
+          if(state is GlobalRegisterSuccess){
+            if(state.userRegisterModel.status==200){
+              Fluttertoast.showToast(
+                  msg: "${state.userRegisterModel.message}",
+                  toastLength: Toast.LENGTH_LONG,
+                  gravity: ToastGravity.BOTTOM,
+                  timeInSecForIosWeb: 5,
+                  backgroundColor: Colors.green,
+                  textColor: Colors.white,
+                  fontSize: 16.0
+              );
+            }else{
+              Fluttertoast.showToast(
+                  msg: "${state.userRegisterModel.message}",
+                  toastLength: Toast.LENGTH_LONG,
+                  gravity: ToastGravity.BOTTOM,
+                  timeInSecForIosWeb: 5,
+                  backgroundColor: Colors.red,
+                  textColor: Colors.white,
+                  fontSize: 16.0
+              );
+            }
+          }
+        },
         builder: (context, state) {
           var cubit = GlobalCubit.get(context);
           final obsecure = cubit.showPass;
           return Scaffold(
             body: Container(
-
               color: ActiveColor,
               child: SingleChildScrollView(
-
                 child: Column(
                   children: [
                     Container(
@@ -160,15 +183,14 @@ class RegisterScreen extends StatelessWidget {
                                     controller: passController,
                                     obscureText:  obsecure,
                                     textInputAction: TextInputAction.done,
-                                    onEditingComplete: () async {},
+                                    onEditingComplete: () async {
+
+                                    },
                                     onFieldSubmitted: (value)
                                     async {
                                       if(formKey.currentState!.validate())
                                       {
-                                        GlobalCubit.get(context).userLogin(
-                                          email: emailController.text,
-                                          password: passController.text,
-                                        );
+
                                         // UserModel? user = await _loginService.login(
                                         //     emailController.text,passController.text);
                                         // Navigator.push(
@@ -208,10 +230,7 @@ class RegisterScreen extends StatelessWidget {
                                     async {
                                       if(formKey.currentState!.validate())
                                       {
-                                        GlobalCubit.get(context).userLogin(
-                                          email: emailController.text,
-                                          password: passController.text,
-                                        );
+
                                         // UserModel? user = await _loginService.login(
                                         //     emailController.text,passController.text);
                                         // Navigator.push(
@@ -275,13 +294,20 @@ class RegisterScreen extends StatelessWidget {
                                         shape: RoundedRectangleBorder(
                                             borderRadius: BorderRadius.circular(10.0)),
                                         color:ActiveColor ,
-                                        onPressed: (){
+                                        onPressed: ()async{
                                           if(formKey.currentState!.validate())
                                           {
-                                            GlobalCubit.get(context).userLogin(
+                                            GlobalCubit.get(context).userRegister(
                                               email: emailController.text,
+                                              name: nameController.text,
+                                              phone: phoneController.text,
                                               password: passController.text,
                                             );
+
+                                            print("Lol I'm here");
+                                            print(GlobalCubit.get(context).userRegisterModel?.message);
+
+                                            await Future.delayed(const Duration(seconds: 5), (){});
                                             // UserModel? user = await _loginService.login(
                                             //     emailController.text,passController.text);
                                             // Navigator.push(

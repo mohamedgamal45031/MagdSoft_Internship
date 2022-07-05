@@ -12,6 +12,7 @@ class GlobalCubit extends Cubit<GlobalState> {
   static GlobalCubit get(context) => BlocProvider.of(context);
 
   UserModel? usermodel;
+  UserRegisterModel? userRegisterModel;
 
   bool showPass = true;
   void userLogin({
@@ -41,6 +42,43 @@ class GlobalCubit extends Cubit<GlobalState> {
       emit(GlobalError(error.toString()));
     });
   }
+  //User Register
+  void userRegister({
+    required String name,
+    required String email,
+    required String phone,
+    required String password,
+  }) {
+    emit(GlobalRegisterLoading());
+
+    DioHelper.postData(
+      url: REGISTER,
+      data:
+      {
+        'name': name,
+        'email': email,
+        'phone': phone,
+        'password': password,
+
+      },
+    ).then((value)
+    {
+      print(value.data);
+      userRegisterModel = UserRegisterModel.fromJson(value.data);
+      emit(GlobalRegisterSuccess(userRegisterModel!));
+      print(userRegisterModel?.message);
+    }).catchError((error)
+    {
+      print(error.toString());
+      emit(GlobalRegisterError(error.toString()));
+    });
+  }
+
+
+
+
+
+
   void ChangePasswordMode() {
     showPass = !showPass;
     emit(ShowPassword());

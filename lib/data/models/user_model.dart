@@ -9,6 +9,15 @@ class UserModel {
     this.data= json['account'][0]!=null ?UserData.fromJson(json['account'][0]):null ;
   }
 }
+class UserRegisterModel {
+
+  int? status;
+  String? message;
+  UserRegisterModel.fromJson(Map<String,dynamic>json){
+    this.status= json['status'];
+    this.message= json['message'];
+  }
+}
 
 class UserData{
    int? id;

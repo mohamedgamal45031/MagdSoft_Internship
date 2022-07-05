@@ -14,5 +14,19 @@ class GlobalSuccess extends GlobalState {
 class GlobalError extends GlobalState {
   GlobalError(String string);
 }
+
+
+class GlobalRegisterLoading extends GlobalState {
+
+}
+class GlobalRegisterSuccess extends GlobalState {
+
+  final UserRegisterModel userRegisterModel;
+
+  GlobalRegisterSuccess(this.userRegisterModel);
+}
+class GlobalRegisterError extends GlobalState {
+  GlobalRegisterError(String string);
+}
 class ShowPassword extends GlobalState {}
 class HidePassword extends GlobalState {}
