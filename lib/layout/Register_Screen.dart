@@ -18,7 +18,7 @@ class RegisterScreen extends StatelessWidget {
   final pass2Controller = TextEditingController();
   final emailController = TextEditingController();
   final passController = TextEditingController();
-  final ILogin _loginService = LoginService();
+  // final ILogin _loginService = LoginService();
   var formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {

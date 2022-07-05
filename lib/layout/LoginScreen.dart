@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_conditional_rendering/conditional.dart';
 import 'package:magdsoft_flutter_structure/business_logic/global_cubit/global_cubit.dart';
 
 import '../business_logic/login_interface.dart';
@@ -15,15 +16,27 @@ class LoginScreen extends StatelessWidget {
   Color ActiveColor = Color(0xFF005DA3);
   final emailController = TextEditingController();
   final passController = TextEditingController();
-  final ILogin _loginService = LoginService();
+  // final ILogin _loginService = LoginService();
+  UserModel? model;
   var formKey = GlobalKey<FormState>();
+  Future<void> _navigateAndDisplaySelection(BuildContext context,UserModel moo) async {
+    await Navigator.push(
+      context,
+      // Create the SelectionScreen in the next step.
+      MaterialPageRoute(builder: (context) =>  HomeView(moo)),);
+  }
   @override
   Widget build(BuildContext context) {
     var padding = MediaQuery.of(context).padding;
     return BlocProvider(
       create: (BuildContext context) => GlobalCubit(),
       child: BlocConsumer<GlobalCubit, GlobalState>(
-        listener: (context, state) {},
+        listener: (context, state) {
+            if(state is GlobalSuccess){
+              model = GlobalCubit.get(context).usermodel;
+              print(model);
+            }
+        },
         builder: (context, state) {
           var cubit = GlobalCubit.get(context);
           final obsecure = cubit.showPass;
@@ -107,15 +120,21 @@ class LoginScreen extends StatelessWidget {
                                       controller: passController,
                                       obscureText:  obsecure,
                                       textInputAction: TextInputAction.done,
-                                      onEditingComplete: () async {},
-                                      onFieldSubmitted: (value)
-                                      async {
+                                      onEditingComplete: () async {
                                         if(formKey.currentState!.validate())
                                         {
-                                          GlobalCubit.get(context).userLogin(
+                                          GlobalCubit.get(context)
+                                              .userLogin(
                                             email: emailController.text,
                                             password: passController.text,
                                           );
+                                          print("Lol I'm here");
+                                          print(GlobalCubit.get(context).usermodel!.data);
+                                      }
+                                        },
+                                      onFieldSubmitted: (value)
+                                       {
+
                                           // UserModel? user = await _loginService.login(
                                           //     emailController.text,passController.text);
                                           // Navigator.push(
@@ -123,7 +142,7 @@ class LoginScreen extends StatelessWidget {
                                           //   MaterialPageRoute(builder: (context) => HomeView(user: user!)),
                                           // );
                                         }
-                                      },
+                                      ,
                                       validator: (value) {
                                         if (value!.isEmpty) {
                                           return 'password is too short';
@@ -149,33 +168,34 @@ class LoginScreen extends StatelessWidget {
                                   ),
                                   Stack(
                                     children: [
-                                      Container(
-                                        alignment: AlignmentDirectional.bottomEnd,
-                                        child: MaterialButton(
-                                          height: 61.0,
-                                          minWidth: 152.0,
-                                          shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(10.0)),
-                                          color:ActiveColor ,
-                                          onPressed: ()async{
-                                            if(formKey.currentState!.validate())
-                                            {
-                                              GlobalCubit.get(context).userLogin(
-                                                email: emailController.text,
-                                                password: passController.text,
-                                              );
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(builder: (context) =>HomeView()),
-                                              );
-                                            }
-                                          },
-                                          child:Text("Login",style: TextStyle(
-                                            fontSize: 15,
-                                            color:Color(0xffFFFFFF),
-                                          ),
+                                      Conditional.single(
+                                        context: context,
+                                        conditionBuilder: (BuildContext context) => state is! GlobalLoading ,
+                                        widgetBuilder: (BuildContext context) => Container(
+                                          alignment: AlignmentDirectional.bottomEnd,
+                                          child: MaterialButton(
+                                            height: 61.0,
+                                            minWidth: 152.0,
+                                            shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(10.0)),
+                                            color:ActiveColor ,
+                                            onPressed: ()async {
+                                              if (formKey.currentState!
+                                                  .validate()) {
+
+                                                await Future.delayed(const Duration(seconds: 5), (){});
+                                                _navigateAndDisplaySelection(
+                                                    context,model!);
+                                              }
+                                            },
+                                            child:Text("Login",style: TextStyle(
+                                              fontSize: 15,
+                                              color:Color(0xffFFFFFF),
+                                            ),
+                                            ),
                                           ),
                                         ),
+                                        fallbackBuilder: (BuildContext context) => Center(child: CircularProgressIndicator()),
                                       ),
                                       Container(
                                         alignment: AlignmentDirectional.bottomStart,
